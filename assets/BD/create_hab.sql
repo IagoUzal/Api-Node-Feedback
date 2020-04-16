@@ -1,6 +1,13 @@
 create database hab;
 use hab;
 
+create table location(
+	id int primary key not null,
+    name varchar(30) not null,
+    create_location timestamp default current_timestamp,
+    update_location timestamp default current_timestamp on update current_timestamp
+);
+
 create table user(
 	id int primary key auto_increment,
     name varchar(30) not null,
@@ -12,13 +19,6 @@ create table user(
     create_user timestamp default current_timestamp,
     update_user timestamp default current_timestamp on update current_timestamp,
     constraint fk_location_id foreign key (location_id) references location(id)
-);
-
-create table location(
-	id int primary key not null,
-    name varchar(30) not null,
-    create_location timestamp default current_timestamp,
-    update_location timestamp default current_timestamp on update current_timestamp
 );
 
 create table type(
