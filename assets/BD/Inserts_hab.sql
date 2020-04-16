@@ -80,5 +80,5 @@ values
     insert into feedback (title, text, from_user_id, to_user_id, type_id, category_id)
     values ('UI UX', 'Trabaje con él en varios proyectos de UI UX y fue una gran referencia para mi', 3, 1, 2, 2);
     insert into feedback (title, text, from_user_id, to_user_id, type_id, category_id)
-    values ('Formacion de sistemas', 'Me dio la formación interna de sistemas y aprendí muchísimo', 6, 1, 1, 1);
+    values ('Formacion de sistemas', 'Me dio la formación interna de sistemas y aprendí muchísimo', 4, 1, 1, 1);
     
