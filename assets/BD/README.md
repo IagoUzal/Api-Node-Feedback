@@ -17,3 +17,7 @@ Son los datos introducidos de ejemplo
 **consultas_hab.sql**
 
 Consultas para probar las relaciones
+
+---
+
+![ER hab](ER.png)
