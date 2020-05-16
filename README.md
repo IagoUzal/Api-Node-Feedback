@@ -17,5 +17,5 @@ Realizar proyecto asignado con todo lo aprendido durante el Bootcamp:
 
 ## Entregas parciales
 
-- Base de datos MySQL ✅
-  ...
+✅ Base de datos MySQL
+...
