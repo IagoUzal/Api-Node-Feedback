@@ -1,7 +1,9 @@
 # ProyectoHAB
+
 Repositorio para proyecto Bootcamp Hack A Bos
 
 ## Objetivos
+
 Realizar proyecto asignado con todo lo aprendido durante el Bootcamp:
 
 - HTML, CSS, JS
@@ -14,4 +16,6 @@ Realizar proyecto asignado con todo lo aprendido durante el Bootcamp:
 [PDF proyecto](/assets/12_agradecimientos_colaboradores.pdf)
 
 ## Entregas parciales
-...
+
+- Base de datos MySQL ✅
+  ...
