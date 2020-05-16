@@ -15,6 +15,12 @@ app.get('/', (req, res, next) => {
   res.send('Pagina de inicio');
 });
 
+//Middleware de error
+app.use((error, req, res, next) => {
+  console.log(error);
+  res.status(error.httpCode || 500).send({ status: 'error', message: error.message });
+});
+
 // Pagina no encontrada
 app.use((req, res) => {
   res.status(404).send('{status: "error", message: "Pagina no encontrada"}');
