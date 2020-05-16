@@ -1,0 +1,31 @@
+{
+  "name": "ProyectoHAB",
+  "version": "1.0.0",
+  "description": "Repositorio para proyecto Bootcamp Hack A Bos",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IagoUzal/ProyectoHAB.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IagoUzal/ProyectoHAB/issues"
+  },
+  "homepage": "https://github.com/IagoUzal/ProyectoHAB#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
