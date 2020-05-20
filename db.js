@@ -13,8 +13,11 @@ async function getConnection() {
       user: MYSQL_USER,
       password: MYSQL_PASSWORD,
       database: MYSQL_DATABASE,
+      timezone: 'Z',
     });
   }
+
+  return await pool.getConnection();
 }
 
 module.exports = {
