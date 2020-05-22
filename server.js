@@ -2,20 +2,26 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 const port = process.env.PORT;
 
-const { listMessages, getMessage, newMessage, deleteMessage } = require('./controllers/messages');
+const { listMessages, getMessage, newMessage, editMessage, deleteMessage } = require('./controllers/messages');
 
 //Middlewares
+// Console logger
 app.use(morgan('dev'));
+// Body parsing
 app.use(bodyParser.json());
+// Multipart parsing
+app.use(fileUpload());
 
-// Routes
+// Routes Messages
 app.get('/messages', listMessages);
 app.get('/messages/:id', getMessage);
 app.post('/messages', newMessage);
+app.put('/messages/:id', editMessage);
 app.delete('/messages/:id', deleteMessage);
 
 //Middleware de error
