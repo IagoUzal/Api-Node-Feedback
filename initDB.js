@@ -2,10 +2,15 @@
   FIXME: 
     - Error al resetear la bd, constrait... REVISAR
     - Si la bd está vacía si ejecuta e introduce los datos de ejemplo
+
+  TODO: 
+    - encriptar el password de los usuarios normales de ejemplo
+    - cambiar location default sin provincia, validar con Joi
 */
 
 const { getConnection } = require('./db');
 const args = process.argv;
+const bcrypt = require('bcrypt');
 
 //Si seleccionamos el argumento --data creamos datos iniciales
 const addData = args[2] === '--data';
@@ -27,7 +32,8 @@ async function main() {
     avatar varchar(255) default 'sin imagen',
     email varchar(30) not null unique,
     password varchar(255) not null,
-    location varchar(30) not null,
+    location varchar(30) default 'sin provincia' not null,
+    role enum("normal", "admin") default "normal" not null,
     create_user timestamp default current_timestamp,
     update_user timestamp default current_timestamp on update current_timestamp
 );
@@ -56,10 +62,20 @@ async function main() {
   if (addData) {
     console.log('Creando datos de ejemplo');
 
+    // Creando user Admin
+    const password = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD, 10);
+
+    await connection.query(`
+      insert into users (name, surname, email, password, location, role)
+      values
+      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '${password}', 'A Coruña', 'admin')
+    `);
+
+    // Creando user normal
     await connection.query(`
       insert into users (name, surname, email, password, location) 
       values
-      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '123456', 'A Coruña');
+      ('Ruben', 'Perez Perez', 'rubii9@gmail.com', '123456', 'A Coruña');
     `);
 
     await connection.query(`
@@ -68,10 +84,11 @@ async function main() {
       ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '123456', 'Lugo');
     `);
 
+    // Creando message de ejeplo
     await connection.query(`
       insert into messages (title, text, type, category, from_users_id, to_users_id)
       values
-      ('Configurando MySQL', 'Me ayudo mucho en la configuración de MySQl', 'Referencia', 'Profesional', 1, 2);
+      ('Configurando MySQL', 'Me ayudo mucho en la configuración de MySQl', 'Referencia', 'Profesional', 2, 3);
     `);
   }
 
