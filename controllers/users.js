@@ -1,8 +1,21 @@
+/*
+FIXME:
+  - User Login
+    Unexpected string in JSON at position 32 🤷🏻‍♂️
+
+ TODO:
+  - Falta procesar imagen en el registro de usuario
+ */
+
+require('dotenv').config();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const { getConnection } = require('../db');
 const { userSchema } = require('./validations');
-
 const { generateError } = require('../helpers');
+
+// POST - Register User
 
 async function register(req, res, next) {
   try {
@@ -18,10 +31,10 @@ async function register(req, res, next) {
       throw generateError('El email ya existe', 409);
     }
 
-    // Hash Paaasword
+    // Hash Password
     const dbPassword = await bcrypt.hash(password, 10);
 
-    await connection.query(
+    const [result] = await connection.query(
       `
       insert into users (name, surname, email, password, location)
       values
@@ -33,21 +46,96 @@ async function register(req, res, next) {
 
     res.send({
       status: 'ok',
+      data: {
+        id: result.insertId,
+        name: name,
+        surname: surname,
+        email: email,
+        location: location,
+      },
       message: 'Usuario registrado, revisa tu email para validación. Mira en la carpeta SPAM seguro esta allí',
     });
   } catch (error) {
     next(error);
   }
-
-  res.send({ register: 'ok' });
 }
+
+// GET - User info
 
 async function info(req, res, next) {
-  res.send({ info: 'ok' });
+  try {
+    const { id } = req.params;
+    const connection = await getConnection();
+
+    const [result] = await connection.query(
+      `
+      select name, surname, avatar, email, location from users where id=?
+    `,
+      [id]
+    );
+
+    if (!result.length) {
+      throw generateError(`No existe usuario con la id: ${id}`, 404);
+    }
+
+    connection.release();
+
+    res.send({
+      info: 'ok',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
+// POST - User Login
+
 async function login(req, res, next) {
-  res.send({ login: 'ok' });
+  try {
+    let connection;
+    await userSchema.validateAsync(req.body);
+
+    const { email, password } = req.body;
+    connection = await getConnection();
+
+    const [dbUser] = await connection.query(
+      `
+      select id, email, password, role from users where email=?
+    `,
+      [email]
+    );
+
+    if (!dbUser.length) {
+      throw generateError(
+        'No hay ningún usuario activo con ese email en la base de datos. Si te acabas de registrar valida el email',
+        404
+      );
+    }
+
+    const [user] = dbUser;
+
+    const passwordsMath = await bcrypt.compare(password, user.password);
+
+    if (!passwordsMath) {
+      throw generateError('Password incorrecta', 401);
+    }
+
+    const tokenPayload = { id: user.id, email: user.email, role: user.role };
+    const token = jwt.sign(tokenPayload, process.env.SECRET, { expiresIn: '10h' });
+
+    res.send({
+      status: 'ok',
+      message: 'Login Ok',
+      data: { token },
+    });
+  } catch (error) {
+    next(error);
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
 }
 
 module.exports = {
