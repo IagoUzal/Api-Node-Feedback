@@ -1,13 +1,11 @@
 /*
-  FIXME: 
-    - Error al resetear la bd, constrait... REVISAR
-    - Si la bd está vacía si ejecuta e introduce los datos de ejemplo
 
   TODO: 
-    - encriptar el password de los usuarios normales de ejemplo
     - cambiar location default sin provincia, validar con Joi
+    
 */
 
+require('dotenv').config();
 const { getConnection } = require('./db');
 const args = process.argv;
 const bcrypt = require('bcrypt');
@@ -20,8 +18,8 @@ async function main() {
   const connection = await getConnection();
 
   console.log('Eliminando tablas si existen');
-  await connection.query('DROP TABLE IF EXISTS users');
   await connection.query('DROP TABLE IF EXISTS messages');
+  await connection.query('DROP TABLE IF EXISTS users');
 
   //Create Table Users
   await connection.query(`
@@ -53,8 +51,8 @@ async function main() {
     to_users_id int not null,
     create_message timestamp default current_timestamp,
     update_message timestamp default current_timestamp on update current_timestamp,
-    constraint fk_from_users_id foreign key (from_users_id) references users(id),
-    constraint fk_to_users_id foreign key (to_users_id) references users(id)
+    constraint fk_from_users_id foreign key (from_users_id) references users(id) on delete cascade,
+    constraint fk_to_users_id foreign key (to_users_id) references users(id) on delete cascade
 );
   `);
 
@@ -63,28 +61,30 @@ async function main() {
     console.log('Creando datos de ejemplo');
 
     // Creando user Admin
-    const password = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD, 10);
+    const adminPassword = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD, 10);
 
     await connection.query(`
       insert into users (name, surname, email, password, location, role)
       values
-      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '${password}', 'A Coruña', 'admin')
+      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '${adminPassword}', 'A Coruña', 'admin')
     `);
 
     // Creando user normal
+    const userPassword = await bcrypt.hash(process.env.DEFAULT_USER_DEMO_PASSWORD, 10);
+
     await connection.query(`
       insert into users (name, surname, email, password, location) 
       values
-      ('Ruben', 'Perez Perez', 'rubii9@gmail.com', '123456', 'A Coruña');
+      ('Ruben', 'Perez Perez', 'rubii9@gmail.com', '${userPassword}', 'A Coruña');
     `);
 
     await connection.query(`
       insert into users (name, surname, email, password, location) 
       values
-      ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '123456', 'Lugo');
+      ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '${userPassword}', 'Lugo');
     `);
 
-    // Creando message de ejeplo
+    // Creando message de ejemplo
     await connection.query(`
       insert into messages (title, text, type, category, from_users_id, to_users_id)
       values
