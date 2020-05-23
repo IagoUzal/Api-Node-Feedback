@@ -1,5 +1,6 @@
 const { getConnection } = require('../db');
 const { processAndSaveImage, deleteImage } = require('../helpers');
+const { newMessageSchema } = require('./validations');
 
 // Rutas para anonimous user
 
@@ -67,12 +68,19 @@ async function getMessage(req, res, next) {
 async function newMessage(req, res, next) {
   try {
     const connection = await getConnection();
+    await newMessageSchema.validateAsync(req.body);
     const { from_users_id, to_users_id, title, text, type, category, image } = req.body;
 
     console.log(req.files.image);
 
     if (!from_users_id || !to_users_id || !title || !text || !type || !category) {
       const error = new Error('Los campos de, para, titulo, texto, tipo y categoria son obligatorios');
+      error.httpCode = 400;
+      throw error;
+    }
+
+    if (from_users_id === to_users_id) {
+      const error = new Error('El usuario from y el usuario to deben de ser distintos');
       error.httpCode = 400;
       throw error;
     }
@@ -196,12 +204,6 @@ async function deleteMessage(req, res, next) {
     }
 
     await connection.query(`delete from messages where id=?`, [id]);
-
-    // if (result.affectedRows === 0) {
-    //   const error = new Error(`El mensaje con la id: ${id} no existe`);
-    //   error.httpCode = 400;
-    //   throw error;
-    // }
 
     connection.release();
 

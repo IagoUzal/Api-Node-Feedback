@@ -29,4 +29,12 @@ async function deleteImage(imagePath) {
   await fs.unlink(path.join(imageUploadPath, imagePath));
 }
 
-module.exports = { processAndSaveImage, deleteImage };
+// Generador de errores
+
+function generateError(message, code) {
+  const error = new Error(message);
+  if (code) error.httpCode = code;
+  return error;
+}
+
+module.exports = { processAndSaveImage, deleteImage, generateError };
