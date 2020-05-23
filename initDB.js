@@ -1,3 +1,9 @@
+/*
+  FIXME: 
+    - Error al resetear la bd, constrait... REVISAR
+    - Si la bd está vacía si ejecuta e introduce los datos de ejemplo
+*/
+
 const { getConnection } = require('./db');
 const args = process.argv;
 
