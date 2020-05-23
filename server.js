@@ -7,6 +7,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 const port = process.env.PORT;
 
+const { register, info, login } = require('./controllers/users');
 const { listMessages, getMessage, newMessage, editMessage, deleteMessage } = require('./controllers/messages');
 
 //Middlewares
@@ -16,6 +17,19 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 // Multipart parsing
 app.use(fileUpload());
+
+// Routes Users
+app.post('/users', register);
+app.post('/users/login', login);
+app.get('/users/:id', info);
+
+// Protected Routes
+app.get('/only-users', (req, res, next) => {
+  res.send({ message: 'Solo usuarios registrados' });
+});
+app.get('only-admin', (req, res, next) => {
+  res.send({ message: 'Solo usuarios admin' });
+});
 
 // Routes Messages
 app.get('/messages', listMessages);
