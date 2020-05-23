@@ -11,6 +11,25 @@ const Joi = require('@hapi/joi');
 
 const { generateError } = require('../../helpers');
 
+// Registro Usuario
+
+const userSchema = Joi.object().keys({
+  name: Joi.string().min(2).max(20).error(generateError('El nombre debe tener entre 2 y 20 caracteres'), 400),
+  surname: Joi.string()
+    .min(2)
+    .max(30)
+    .required()
+    .error(generateError('El apellido debe de tener entre 2 y 30 caracteres')),
+  email: Joi.string().email().required().error(generateError('Comprueba que el email sea correcto'), 400),
+  password: Joi.string()
+    .min(6)
+    .max(100)
+    .required()
+    .error(generateError('La contraseña debe detener como mínimo 6 caracteres '), 400),
+  // FIXME: Falta location, validar de JSON
+  location: Joi.any(),
+});
+
 // New Message
 
 const newMessageSchema = Joi.object().keys({
@@ -35,4 +54,5 @@ const newMessageSchema = Joi.object().keys({
 
 module.exports = {
   newMessageSchema,
+  userSchema,
 };
