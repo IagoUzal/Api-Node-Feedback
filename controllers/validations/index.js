@@ -30,6 +30,17 @@ const userSchema = Joi.object().keys({
   location: Joi.any(),
 });
 
+// Login Usuario
+
+const userLoginSchema = Joi.object().keys({
+  email: Joi.string().email().required().error(generateError('Debes introducir un email valido'), 400),
+  password: Joi.string()
+    .min(6)
+    .max(100)
+    .required()
+    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
+});
+
 // New Message
 
 const newMessageSchema = Joi.object().keys({
@@ -55,4 +66,5 @@ const newMessageSchema = Joi.object().keys({
 module.exports = {
   newMessageSchema,
   userSchema,
+  userLoginSchema,
 };
