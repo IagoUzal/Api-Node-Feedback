@@ -1,7 +1,4 @@
 /*
-FIXME:
-  - User Login
-    Unexpected string in JSON at position 32 🤷🏻‍♂️
 
  TODO:
   - Falta procesar imagen en el registro de usuario
@@ -12,8 +9,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const { getConnection } = require('../db');
-const { userSchema } = require('./validations');
 const { generateError } = require('../helpers');
+const { userSchema, userLoginSchema } = require('./validations');
 
 // POST - Register User
 
@@ -94,7 +91,7 @@ async function info(req, res, next) {
 async function login(req, res, next) {
   try {
     let connection;
-    await userSchema.validateAsync(req.body);
+    await userLoginSchema.validateAsync(req.body);
 
     const { email, password } = req.body;
     connection = await getConnection();
@@ -124,6 +121,8 @@ async function login(req, res, next) {
     const tokenPayload = { id: user.id, email: user.email, role: user.role };
     const token = jwt.sign(tokenPayload, process.env.SECRET, { expiresIn: '10h' });
 
+    connection.release();
+
     res.send({
       status: 'ok',
       message: 'Login Ok',
@@ -131,10 +130,6 @@ async function login(req, res, next) {
     });
   } catch (error) {
     next(error);
-  } finally {
-    if (connection) {
-      connection.release();
-    }
   }
 }
 
