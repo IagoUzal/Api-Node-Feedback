@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT;
@@ -17,19 +18,21 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 // Multipart parsing
 app.use(fileUpload());
+// Cors
+app.use(cors());
 
 // Routes Users
 app.post('/users', register);
 app.post('/users/login', login);
 app.get('/users/:id', info);
 
-// Protected Routes
-app.get('/only-users', (req, res, next) => {
-  res.send({ message: 'Solo usuarios registrados' });
-});
-app.get('only-admin', (req, res, next) => {
-  res.send({ message: 'Solo usuarios admin' });
-});
+// // Protected Routes
+// app.get('/only-users', (req, res, next) => {
+//   res.send({ message: 'Solo usuarios registrados' });
+// });
+// app.get('only-admin', (req, res, next) => {
+//   res.send({ message: 'Solo usuarios admin' });
+// });
 
 // Routes Messages
 app.get('/messages', listMessages);
