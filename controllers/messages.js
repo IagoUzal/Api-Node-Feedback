@@ -73,8 +73,8 @@ async function newMessage(req, res, next) {
 
     console.log(req.files.image);
 
-    if (!from_users_id || !to_users_id || !title || !text || !type || !category) {
-      const error = new Error('Los campos de, para, titulo, texto, tipo y categoria son obligatorios');
+    if (!to_users_id || !title || !text || !type || !category) {
+      const error = new Error('Los campos para, titulo, texto, tipo y categoria son obligatorios');
       error.httpCode = 400;
       throw error;
     }
@@ -101,7 +101,7 @@ async function newMessage(req, res, next) {
       `
       insert into messages (from_users_id, to_users_id, title, text, type, category, image)
       values (?, ?, ?, ?, ?, ?, ?)`,
-      [from_users_id, to_users_id, title, text, type, category, savedFileName]
+      [req.auth.id, to_users_id, title, text, type, category, savedFileName]
     );
 
     connection.release();
@@ -129,7 +129,7 @@ async function editMessage(req, res, next) {
       throw error;
     }
 
-    const [current] = await connection.query(`select image from messages where id=?`, [id]);
+    const [current] = await connection.query(`select image, from_users_id from messages where id=?`, [id]);
     console.log(current);
 
     if (!current.length) {
@@ -138,9 +138,13 @@ async function editMessage(req, res, next) {
       throw error;
     }
 
-    let savedFileName;
+    if (current[0].from_users_id !== req.auth.id && req.auth.role !== 'admin') {
+      const error = new Error('No tienes permiso para editar este mensaje');
+      error.httpCode = 401;
+      throw error;
+    }
 
-    console.log(req.files.image);
+    let savedFileName;
 
     if (req.files && req.files.image) {
       try {
@@ -171,6 +175,7 @@ async function editMessage(req, res, next) {
 
     res.send({
       status: 'ok',
+      message: 'Mensaje actualizado correctamente',
       data: {
         title: title,
         text: text,
@@ -191,11 +196,17 @@ async function deleteMessage(req, res, next) {
 
     const connection = await getConnection();
 
-    const [current] = await connection.query(`select image from messages where id=?`, [id]);
+    const [current] = await connection.query(`select image, from_users_id from messages where id=?`, [id]);
 
     if (!current.length) {
       const error = new Error(`No existe el mensaje con id ${id}`);
       error.httpCode = 400;
+      throw error;
+    }
+
+    if (current[0].from_users_id !== req.auth.id && req.auth.role !== 'admin') {
+      const error = new Error('No tienes permiso para editar este mensaje');
+      error.httpCode = 401;
       throw error;
     }
 
