@@ -1,5 +1,5 @@
 const { getConnection } = require('../db');
-const { processAndSaveImage, deleteImage } = require('../helpers');
+const { processAndSaveImage, deleteImage, generateError } = require('../helpers');
 const { newMessageSchema } = require('./validations');
 
 // Rutas para anonimous user
@@ -69,7 +69,7 @@ async function newMessage(req, res, next) {
   try {
     const connection = await getConnection();
     await newMessageSchema.validateAsync(req.body);
-    const { from_users_id, to_users_id, title, text, type, category, image } = req.body;
+    const { to_users_id, title, text, type, category } = req.body;
 
     console.log(req.files.image);
 
@@ -79,10 +79,13 @@ async function newMessage(req, res, next) {
       throw error;
     }
 
-    if (from_users_id === to_users_id) {
-      const error = new Error('El usuario from y el usuario to deben de ser distintos');
-      error.httpCode = 400;
-      throw error;
+    if (req.auth.id.toString() === to_users_id) {
+      throw generateError('No puedes escribir un mensaje para ti mismo', 400);
+    }
+
+    const [existing] = await connection.query('select id from users where id=?', [to_users_id]);
+    if (!existing.length) {
+      throw generateError('El usuario no existe', 400);
     }
 
     let savedFileName;
@@ -108,7 +111,7 @@ async function newMessage(req, res, next) {
 
     res.send({
       status: 'ok',
-      data: { from_users_id, to_users_id, title, text, type, category, savedFileName },
+      data: { to_users_id, title, text, type, category, savedFileName },
     });
   } catch (error) {
     next(error);
