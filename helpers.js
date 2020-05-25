@@ -1,3 +1,8 @@
+/*
+  TODO:
+    - Mejorar el procesado de imagen, diferenciar entre avatar e imagen de mensaje
+*/
+
 require('dotenv').config();
 const sharp = require('sharp');
 const path = require('path');
