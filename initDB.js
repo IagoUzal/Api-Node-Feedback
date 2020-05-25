@@ -2,7 +2,9 @@
 
   TODO: 
     - cambiar location default sin provincia, validar con Joi
-    
+    - 🤔 on delete set null o update borrado para cuando se borre el usuario sus mensajes
+      cambien a usuario null o borrado
+
 */
 
 require('dotenv').config();
