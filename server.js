@@ -8,8 +8,9 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT;
 
-const { register, info, login } = require('./controllers/users');
+const { registerUsers, infoUsers, loginUsers, editUsers } = require('./controllers/users');
 const { listMessages, getMessage, newMessage, editMessage, deleteMessage } = require('./controllers/messages');
+const { userIsAuthenticated, userIsAdmin } = require('./middlewares/auth');
 
 //Middlewares
 // Console logger
@@ -22,24 +23,17 @@ app.use(fileUpload());
 app.use(cors());
 
 // Routes Users
-app.post('/users', register);
-app.post('/users/login', login);
-app.get('/users/:id', info);
-
-// // Protected Routes
-// app.get('/only-users', (req, res, next) => {
-//   res.send({ message: 'Solo usuarios registrados' });
-// });
-// app.get('only-admin', (req, res, next) => {
-//   res.send({ message: 'Solo usuarios admin' });
-// });
+app.post('/users', registerUsers); // Anonimo
+app.post('/users/login', loginUsers); // Anonimo
+app.get('/users/:id', infoUsers); // Anonimo
+app.put('/users/:id', userIsAuthenticated, editUsers); // Solo el propio usuario o admin
 
 // Routes Messages
-app.get('/messages', listMessages);
-app.get('/messages/:id', getMessage);
-app.post('/messages', newMessage);
-app.put('/messages/:id', editMessage);
-app.delete('/messages/:id', deleteMessage);
+app.get('/messages', listMessages); // Anonimo
+app.get('/messages/:id', getMessage); // Anonimo
+app.post('/messages', userIsAuthenticated, newMessage); // Solo Usuarios o admin
+app.put('/messages/:id', userIsAuthenticated, editMessage); // Solo Usuarios que crearon el mensaje o admin
+app.delete('/messages/:id', userIsAuthenticated, deleteMessage); // Solo Usuarios que crearon el mensaje o admin
 
 //Middleware de error
 app.use((error, req, res, next) => {
