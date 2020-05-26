@@ -35,6 +35,8 @@ async function main() {
     password varchar(255) not null,
     location varchar(30) default 'sin provincia' not null,
     role enum("normal", "admin") default "normal" not null,
+    active boolean default false not null,
+    registration_code varchar(255),
     create_user timestamp default current_timestamp,
     update_user timestamp default current_timestamp on update current_timestamp,
     last_password_update timestamp default current_timestamp on update current_timestamp
@@ -68,24 +70,24 @@ async function main() {
     const adminPassword = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD, 10);
 
     await connection.query(`
-      insert into users (name, surname, email, password, location, role)
+      insert into users (name, surname, email, password, location, role, active)
       values
-      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '${adminPassword}', 'A Coruña', 'admin')
+      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '${adminPassword}', 'A Coruña', 'admin', true)
     `);
 
     // Creando user normal
     const userPassword = await bcrypt.hash(process.env.DEFAULT_USER_DEMO_PASSWORD, 10);
 
     await connection.query(`
-      insert into users (name, surname, email, password, location) 
+      insert into users (name, surname, email, password, location, active) 
       values
-      ('Ruben', 'Perez Perez', 'rubii9@gmail.com', '${userPassword}', 'A Coruña');
+      ('Ruben', 'Perez Perez', 'rubii9@gmail.com', '${userPassword}', 'A Coruña', true);
     `);
 
     await connection.query(`
-      insert into users (name, surname, email, password, location) 
+      insert into users (name, surname, email, password, location, active) 
       values
-      ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '${userPassword}', 'Lugo');
+      ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
     `);
 
     // Creando message de ejemplo
