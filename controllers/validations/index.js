@@ -48,8 +48,27 @@ const editUserSchema = Joi.object().keys({
     .required()
     .error(generateError('El apellido debe de tener entre 2 y 30 caracteres')),
   email: Joi.string().email().required().error(generateError('Comprueba que el email sea correcto'), 400),
-  // FIXME: Falta location, validar de JSON
+  // FIXME: Falta location, validar de JSON??
   location: Joi.any(),
+});
+
+// Edit password User
+
+const editUserPasswordSchema = Joi.object().keys({
+  oldPassword: Joi.string()
+    .min(6)
+    .max(100)
+    .required()
+    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
+  newPassword: Joi.string()
+    .min(6)
+    .max(100)
+    .required()
+    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
+  newPasswordRepeat: Joi.string()
+    .min(6)
+    .max(100)
+    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
 });
 
 // New Message
@@ -77,4 +96,5 @@ module.exports = {
   userSchema,
   userLoginSchema,
   editUserSchema,
+  editUserPasswordSchema,
 };
