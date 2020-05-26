@@ -10,7 +10,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const { getConnection } = require('../db');
-const { generateError, processAndSaveImage, deleteImage } = require('../helpers');
+const { generateError, processAndSaveImage, deleteImage, randomString, sendEmail } = require('../helpers');
 const { userSchema, userLoginSchema, editUserSchema, editUserPasswordSchema } = require('./validations');
 
 // POST - Register User
@@ -33,18 +33,32 @@ async function registerUsers(req, res, next) {
     // Hash Password
     const dbPassword = await bcrypt.hash(password, 10);
 
-    const [result] = await connection.query(
+    const registrationCode = randomString(40);
+
+    const validationURL = `${process.env.HOST}/users/validate?code=${registrationCode}`;
+
+    try {
+      await sendEmail({
+        email: email,
+        title: 'Valida tu cuenta de usuario en la app de diario mysql',
+        content: `Para validar tu cuenta de usuario pega esta url en tu navegador: ${validationURL}`,
+      });
+    } catch (error) {
+      console.error(error.response.body);
+      throw new Error('Error en el envío de mail. Inténtalo de nuevo más tarde.');
+    }
+
+    await connection.query(
       `
-      insert into users (name, surname, email, password, location)
+      insert into users (name, surname, email, password, location, registration_code)
       values
-      (?, ?, ?, ?, ?)`,
-      [name, surname, email, dbPassword, location]
+      (?, ?, ?, ?, ?, ?)`,
+      [name, surname, email, dbPassword, location, registrationCode]
     );
 
     res.send({
       status: 'ok',
       data: {
-        id: result.insertId,
         name: name,
         surname: surname,
         email: email,
@@ -271,10 +285,24 @@ async function editPassword(req, res, next) {
   }
 }
 
+// GET - Validate User
+
+async function validateUser(req, res, next) {
+  let connection;
+  try {
+    res.send({ status: 'ok' });
+  } catch (error) {
+    next(error);
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 module.exports = {
   registerUsers,
   infoUsers,
   loginUsers,
   editUsers,
   editPassword,
+  validateUser,
 };
