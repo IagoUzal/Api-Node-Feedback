@@ -4,6 +4,7 @@
     - cambiar location default sin provincia, validar con Joi
     - 🤔 on delete set null o update borrado para cuando se borre el usuario sus mensajes
       cambien a usuario null o borrado
+    - Borrar imagenes de static/uploads al iniciar la bd
 
 */
 
@@ -35,7 +36,8 @@ async function main() {
     location varchar(30) default 'sin provincia' not null,
     role enum("normal", "admin") default "normal" not null,
     create_user timestamp default current_timestamp,
-    update_user timestamp default current_timestamp on update current_timestamp
+    update_user timestamp default current_timestamp on update current_timestamp,
+    last_password_update timestamp default current_timestamp on update current_timestamp
 );
   `);
 
