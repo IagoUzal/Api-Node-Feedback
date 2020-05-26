@@ -8,7 +8,7 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT;
 
-const { registerUsers, infoUsers, loginUsers, editUsers, editPassword } = require('./controllers/users');
+const { registerUsers, infoUsers, loginUsers, editUsers, editPassword, validateUser } = require('./controllers/users');
 const { listMessages, getMessage, newMessage, editMessage, deleteMessage } = require('./controllers/messages');
 const { userIsAuthenticated, userIsAdmin } = require('./middlewares/auth');
 
@@ -28,6 +28,7 @@ app.post('/users/login', loginUsers); // Anonimo
 app.get('/users/:id', infoUsers); // Anonimo
 app.put('/users/:id', userIsAuthenticated, editUsers); // Solo el propio usuario o admin
 app.post('/users/:id/password', userIsAuthenticated, editPassword); // Solo el propio usuario o Admin
+app.get('/users/:id/validate', validateUser);
 
 // Routes Messages
 app.get('/messages', listMessages); // Anonimo
