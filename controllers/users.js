@@ -24,8 +24,9 @@ async function registerUsers(req, res, next) {
     connection = await getConnection();
     const { name, surname, email, password, location } = req.body;
 
-    // Validando que el email no exita
+    // Validando que el email no exista
     const [existing] = await connection.query('select id from users where email=?', [email]);
+
     if (existing.length) {
       throw generateError('El email ya existe', 409);
     }
@@ -35,7 +36,15 @@ async function registerUsers(req, res, next) {
 
     const registrationCode = randomString(40);
 
-    const validationURL = `${process.env.HOST}/users/validate?code=${registrationCode}`;
+    const [result] = await connection.query(
+      `
+      insert into users (name, surname, email, password, location, registration_code)
+      values
+      (?, ?, ?, ?, ?, ?)`,
+      [name, surname, email, dbPassword, location, registrationCode]
+    );
+
+    const validationURL = `${process.env.HOST}/users/${result.insertId}/validate?code=${registrationCode}`;
 
     try {
       await sendEmail({
@@ -47,14 +56,6 @@ async function registerUsers(req, res, next) {
       console.error(error.response.body);
       throw new Error('Error en el envío de mail. Inténtalo de nuevo más tarde.');
     }
-
-    await connection.query(
-      `
-      insert into users (name, surname, email, password, location, registration_code)
-      values
-      (?, ?, ?, ?, ?, ?)`,
-      [name, surname, email, dbPassword, location, registrationCode]
-    );
 
     res.send({
       status: 'ok',
@@ -115,7 +116,7 @@ async function loginUsers(req, res, next) {
 
     const [dbUser] = await connection.query(
       `
-      select id, email, password, role from users where email=?
+      select id, email, password, role from users where email=? and active=1
     `,
       [email]
     );
@@ -290,7 +291,22 @@ async function editPassword(req, res, next) {
 async function validateUser(req, res, next) {
   let connection;
   try {
-    res.send({ status: 'ok' });
+    const { code } = req.query;
+
+    connection = await getConnection();
+
+    const [result] = await connection.query(
+      `
+      update users set active=1, registration_code=null where registration_code=?
+    `,
+      [code]
+    );
+
+    if (result.affectedRows === 0) {
+      throw generateError('Validación incorrecta', 400);
+    }
+
+    res.send({ status: 'ok', message: 'Usuario validado, puedes hacer login' });
   } catch (error) {
     next(error);
   } finally {
