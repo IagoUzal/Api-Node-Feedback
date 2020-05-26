@@ -74,9 +74,7 @@ async function newMessage(req, res, next) {
     console.log(req.files.image);
 
     if (!to_users_id || !title || !text || !type || !category) {
-      const error = new Error('Los campos para, titulo, texto, tipo y categoria son obligatorios');
-      error.httpCode = 400;
-      throw error;
+      throw generateError('Los campos para, titulo, texto, tipo y categoria son obligatorios', 400);
     }
 
     if (req.auth.id.toString() === to_users_id) {
