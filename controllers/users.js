@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 
 const { getConnection } = require('../db');
 const { generateError, processAndSaveImage, deleteImage } = require('../helpers');
-const { userSchema, userLoginSchema, editUserSchema } = require('./validations');
+const { userSchema, userLoginSchema, editUserSchema, editUserPasswordSchema } = require('./validations');
 
 // POST - Register User
 
@@ -206,9 +206,75 @@ async function editUsers(req, res, next) {
   }
 }
 
+// POST - Edit password
+
+async function editPassword(req, res, next) {
+  let connection;
+  try {
+    connection = await getConnection();
+    const { id } = req.params;
+
+    // Body: oldPassword, newPassword, newPasswordRepeat (optional)
+    await editUserPasswordSchema.validateAsync(req.body);
+
+    const { oldPassword, newPassword, newPasswordRepeat } = req.body;
+
+    if (Number(id) !== req.auth.id) {
+      throw generateError('No tienes permisos para cambiar el password del usuario', 401);
+    }
+
+    if (newPassword !== newPasswordRepeat) {
+      throw generateError('El campo nueva password y nueva password repetir deben de ser identicos', 400);
+    }
+
+    if (oldPassword === newPassword) {
+      throw generateError('La password actual y la nueva password no pueden ser iguales', 401);
+    }
+
+    const [currentUser] = await connection.query(
+      `
+      select id, password from users where id=?
+    `,
+      [id]
+    );
+
+    if (!currentUser.length) {
+      throw generateError(`El usuario con id: ${id} no existe`, 404);
+    }
+
+    const [dbUser] = currentUser;
+
+    // Comprobar la vieja password
+
+    const passwordsMath = await bcrypt.compare(oldPassword, dbUser.password);
+
+    if (!passwordsMath) {
+      throw generateError('La password actual es incorrecta', 401);
+    }
+
+    // hash nueva password
+
+    const dbNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await connection.query(
+      `
+      update users set password=? where id=?
+    `,
+      [dbNewPassword, id]
+    );
+
+    res.send({ status: 'ok', message: 'Password actualizado correctamente, vuelve a hacer login' });
+  } catch (error) {
+    next(error);
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 module.exports = {
   registerUsers,
   infoUsers,
   loginUsers,
   editUsers,
+  editPassword,
 };
