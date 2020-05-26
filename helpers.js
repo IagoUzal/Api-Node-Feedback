@@ -47,13 +47,13 @@ function generateError(message, code) {
 // Random string
 
 function randomString(size = 20) {
-  return Crypto.randomBytes(size).toString('base64').slice(0, size);
+  return Crypto.randomBytes(size).toString('hex').slice(0, size);
 }
 
 // Send email
 
 async function sendEmail({ email, title, content }) {
-  sgMail.setApiKey(process.env.SENGRID_KEY);
+  sgMail.setApiKey(process.env.SENDGRID_KEY);
 
   const msg = {
     to: email,
