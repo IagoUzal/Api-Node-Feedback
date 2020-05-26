@@ -8,6 +8,8 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs-extra');
 const uuid = require('uuid');
+const Crypto = require('crypto');
+const sgMail = require('@sendgrid/mail');
 
 // Procesando y guardando imagen
 
@@ -42,4 +44,26 @@ function generateError(message, code) {
   return error;
 }
 
-module.exports = { processAndSaveImage, deleteImage, generateError };
+// Random string
+
+function randomString(size = 20) {
+  return Crypto.randomBytes(size).toString('base64').slice(0, size);
+}
+
+// Send email
+
+async function sendEmail({ email, title, content }) {
+  sgMail.setApiKey(process.env.SENGRID_KEY);
+
+  const msg = {
+    to: email,
+    from: 'iagouzal@gmail.com',
+    subject: title,
+    text: content,
+    html: `<h1>Valida tu email</h1><p>${content}</p>`,
+  };
+
+  await sgMail.send(msg);
+}
+
+module.exports = { processAndSaveImage, deleteImage, generateError, randomString, sendEmail };
