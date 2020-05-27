@@ -1,7 +1,7 @@
 /*
 
  TODO:
-  - Falta procesar imagen en el registro de usuario si al final lo requiero como oblogatorio
+  - get users anonimous
 
  */
 

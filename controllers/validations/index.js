@@ -1,12 +1,81 @@
 /* 
   TODO: 
-  - Revisar validación de to_user_id
-  - Organizar los Joi mejor
+  
 */
 
 const Joi = require('@hapi/joi');
 
 const { generateError } = require('../../helpers');
+
+//Location
+
+const locationSchema = Joi.string().valid(
+  'Alava',
+  'Albacete',
+  'Alicante',
+  'Almería',
+  'Asturias',
+  'Avila',
+  'Badajoz',
+  'Barcelona',
+  'Burgos',
+  'Cáceres',
+  'Cádiz',
+  'Cantabria',
+  'Castellón',
+  'Ciudad Real',
+  'Córdoba',
+  'La Coruña',
+  'Cuenca',
+  'Gerona',
+  'Granada',
+  'Guadalajara',
+  'Guipúzcoa',
+  'Huelva',
+  'Huesca',
+  'Islas Baleares',
+  'Jaén',
+  'León',
+  'Lérida',
+  'Lugo',
+  'Madrid',
+  'Málaga',
+  'Murcia',
+  'Navarra',
+  'Orense',
+  'Palencia',
+  'Las Palmas',
+  'Pontevedra',
+  'La Rioja',
+  'Salamanca',
+  'Segovia',
+  'Sevilla',
+  'Soria',
+  'Tarragona',
+  'Santa Cruz de Tenerife',
+  'Teruel',
+  'Toledo',
+  'Valencia',
+  'Valladolid',
+  'Vizcaya',
+  'Zamora',
+  'Zaragoza'
+);
+
+//Email
+
+const emailSchema = Joi.string()
+  .email()
+  .required()
+  .error(generateError('El campo email debe de ser un email bien formado midireccion@midominio.com', 400));
+
+//Password
+
+const passwordSchema = Joi.string()
+  .min(6)
+  .max(100)
+  .required()
+  .error(generateError('La password debe de tener entre 6 y 100 carateres', 400));
 
 // Registro Usuario
 
@@ -17,25 +86,16 @@ const userSchema = Joi.object().keys({
     .max(30)
     .required()
     .error(generateError('El apellido debe de tener entre 2 y 30 caracteres')),
-  email: Joi.string().email().required().error(generateError('Comprueba que el email sea correcto'), 400),
-  password: Joi.string()
-    .min(6)
-    .max(100)
-    .required()
-    .error(generateError('La contraseña debe detener como mínimo 6 caracteres '), 400),
-  // FIXME: Falta location, validar de JSON
-  location: Joi.any(),
+  email: emailSchema,
+  password: passwordSchema,
+  location: locationSchema,
 });
 
 // Login Usuario
 
 const userLoginSchema = Joi.object().keys({
-  email: Joi.string().email().required().error(generateError('Debes introducir un email valido'), 400),
-  password: Joi.string()
-    .min(6)
-    .max(100)
-    .required()
-    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
+  email: emailSchema,
+  password: passwordSchema,
 });
 
 // Edit Usuario
@@ -47,28 +107,18 @@ const editUserSchema = Joi.object().keys({
     .max(30)
     .required()
     .error(generateError('El apellido debe de tener entre 2 y 30 caracteres')),
-  email: Joi.string().email().required().error(generateError('Comprueba que el email sea correcto'), 400),
-  // FIXME: Falta location, validar de JSON??
-  location: Joi.any(),
+  email: emailSchema,
+  location: locationSchema,
 });
 
 // Edit password User
 
 const editUserPasswordSchema = Joi.object().keys({
-  oldPassword: Joi.string()
-    .min(6)
-    .max(100)
-    .required()
-    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
-  newPassword: Joi.string()
-    .min(6)
-    .max(100)
-    .required()
-    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
-  newPasswordRepeat: Joi.string()
-    .min(6)
-    .max(100)
-    .error(generateError('La contraseña debe tener como minimo 6 caracteres')),
+  oldPassword: passwordSchema,
+  newPassword: passwordSchema,
+  newPasswordRepeat: Joi.any()
+    .valid(Joi.ref('newPassword'))
+    .error(generateError('Las passwords debe ser iguales', 400)),
 });
 
 // New Message

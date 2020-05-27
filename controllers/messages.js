@@ -1,3 +1,9 @@
+/*
+  TODO:
+    - query search get messages (user, time, title, type, category)
+    - use function generateError in the errors
+*/
+
 const { getConnection } = require('../db');
 const { processAndSaveImage, deleteImage, generateError } = require('../helpers');
 const { newMessageSchema } = require('./validations');
