@@ -8,7 +8,15 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT;
 
-const { registerUsers, infoUsers, loginUsers, editUsers, editPassword, validateUser } = require('./controllers/users');
+const {
+  registerUsers,
+  listUsers,
+  infoUsers,
+  loginUsers,
+  editUsers,
+  editPassword,
+  validateUser,
+} = require('./controllers/users');
 const { listMessages, getMessage, newMessage, editMessage, deleteMessage } = require('./controllers/messages');
 const { userIsAuthenticated, userIsAdmin } = require('./middlewares/auth');
 
@@ -23,6 +31,7 @@ app.use(fileUpload());
 app.use(cors());
 
 // Routes Users
+app.get('/users', listUsers); // Anonimo
 app.post('/users', registerUsers); // Anonimo
 app.post('/users/login', loginUsers); // Anonimo
 app.get('/users/:id', infoUsers); // Anonimo
