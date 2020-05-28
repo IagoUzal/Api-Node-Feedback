@@ -6,7 +6,7 @@
 
 const { getConnection } = require('../db');
 const { processAndSaveImage, deleteImage, generateError } = require('../helpers');
-const { newMessageSchema } = require('./validations');
+const { newMessageSchema, searchSchema } = require('./validations');
 
 // Rutas para anonimous user
 
@@ -16,7 +16,22 @@ const { newMessageSchema } = require('./validations');
 async function listMessages(req, res, next) {
   try {
     const connection = await getConnection();
-    const [messages] = await connection.query(`
+    const { search } = req.query;
+
+    let result;
+
+    if (search) {
+      await searchSchema.validateAsync(search);
+
+      [result] = await connection.query(
+        `
+        select title, text, type, category from messages
+        where messages.title like ? or messages.text like ? or messages.type like ? or messages.category like ?
+      `,
+        [`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`]
+      );
+    } else {
+      [result] = await connection.query(`
       select concat_ws(' ',a.name, b.surname) as De, concat_ws(' ',c.name, d.surname) as Para, title, text, image, type, category, create_message from messages
       inner join users a on a.id = from_users_id
       inner join users b on b.id = from_users_id
@@ -24,6 +39,9 @@ async function listMessages(req, res, next) {
       inner join users d on d.id = to_users_id
       order by create_message desc;
     `);
+    }
+
+    const [messages] = result;
 
     connection.release();
 
