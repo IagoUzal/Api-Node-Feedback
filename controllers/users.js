@@ -1,7 +1,6 @@
 /*
 
  TODO:
-  - get users anonimous
 
  */
 
@@ -67,6 +66,25 @@ async function registerUsers(req, res, next) {
       },
       message: 'Usuario registrado, revisa tu email para validación. Mira en la carpeta SPAM seguro esta allí',
     });
+  } catch (error) {
+    next(error);
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+// GET - users
+
+async function listUsers(req, res, next) {
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const [users] = await connection.query(`
+      select name, surname, avatar, location from users
+    `);
+
+    res.send({ status: 'ok', messsage: 'lista de usuarios', data: users });
   } catch (error) {
     next(error);
   } finally {
@@ -316,6 +334,7 @@ async function validateUser(req, res, next) {
 
 module.exports = {
   registerUsers,
+  listUsers,
   infoUsers,
   loginUsers,
   editUsers,
