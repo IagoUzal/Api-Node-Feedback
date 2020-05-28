@@ -7,6 +7,13 @@ const Joi = require('@hapi/joi');
 
 const { generateError } = require('../../helpers');
 
+//Search
+
+const searchSchema = Joi.string()
+  .min(2)
+  .required()
+  .error(generateError('El campo de búsqueda debe de ser de máis de 2 caracteres', 400));
+
 //Location
 
 const locationSchema = Joi.string().valid(
@@ -147,4 +154,5 @@ module.exports = {
   userLoginSchema,
   editUserSchema,
   editUserPasswordSchema,
+  searchSchema,
 };
