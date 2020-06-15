@@ -47,7 +47,8 @@ async function listMessages(req, res, next) {
 
     res.send({
       status: 'ok',
-      data: messages,
+      message: 'Lista de mensajes',
+      data: result,
     });
   } catch (error) {
     next(error);
