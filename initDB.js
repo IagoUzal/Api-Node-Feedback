@@ -87,11 +87,17 @@ async function main() {
       ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
     `);
 
-    // Creando message de ejemplo
+    // Creando menssages example
     await connection.query(`
       insert into messages (title, text, type, category, from_users_id, to_users_id)
       values
       ('Configurando MySQL', 'Me ayudo mucho en la configuración de MySQl', 'Referencia', 'Profesional', 2, 3);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, from_users_id, to_users_id)
+      values
+      ('Instalando Windows', 'Me enseñó a configurar windows para programar web', 'Agradecimiento', 'Profesional', 3, 1);
     `);
   }
 
