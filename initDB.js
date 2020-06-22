@@ -9,6 +9,7 @@ require('dotenv').config();
 const { getConnection } = require('./db');
 const args = process.argv;
 const bcrypt = require('bcrypt');
+const faker = require('faker/locale/es');
 
 //Si seleccionamos el argumento --data creamos datos iniciales
 const addData = args[2] === '--data';
@@ -65,26 +66,46 @@ async function main() {
 
     // Creando user Admin
     const adminPassword = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD, 10);
+    const adminAvatar = `${process.env.HOST}/static/uploads/iagoavatar.jpg`;
 
     await connection.query(`
-      insert into users (name, surname, email, password, location, role, active)
+      insert into users (name, surname, avatar, email, password, location, role, active)
       values
-      ('Iago', 'Alvarez Uzal', 'iagouzal@gmail.com', '${adminPassword}', 'A Coruña', 'admin', true)
+      ('Iago', 'Alvarez Uzal','${adminAvatar}', 'iagouzal@gmail.com', '${adminPassword}', 'A Coruña', 'admin', true)
     `);
 
     // Creando user normal
     const userPassword = await bcrypt.hash(process.env.DEFAULT_USER_DEMO_PASSWORD, 10);
+    const avatarFaker = faker.internet.avatar();
 
     await connection.query(`
-      insert into users (name, surname, email, password, location, active) 
+      insert into users (name, surname, avatar, email, password, location, active) 
       values
-      ('Ruben', 'Perez Perez', 'rubii9@gmail.com', '${userPassword}', 'A Coruña', true);
+      ('Ruben', 'Perez Perez', '${avatarFaker}', 'rubii9@gmail.com', '${userPassword}', 'A Coruña', true);
     `);
 
     await connection.query(`
-      insert into users (name, surname, email, password, location, active) 
+      insert into users (name, surname, avatar, email, password, location, active) 
       values
-      ('Juan', 'Dominguez Lopez', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
+      ('Juan', 'Dominguez Lopez', '${avatarFaker}', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
+    `);
+
+    await connection.query(`
+      insert into users (name, surname, avatar, email, password, location, active) 
+      values
+      ('Noe', 'Torres Torres', '${avatarFaker}', 'tttorres@gmail.com', '${userPassword}', 'Madrid', true);
+    `);
+
+    await connection.query(`
+      insert into users (name, surname, avatar, email, password, location, active) 
+      values
+      ('Jordi', 'Camps Vilanova', '${avatarFaker}', 'jjjordi@gmail.com', '${userPassword}', 'Barcelona', true);
+    `);
+
+    await connection.query(`
+      insert into users (name, surname, avatar, email, password, location, active) 
+      values
+      ('Paco', 'Lopez Lopez', '${avatarFaker}', 'plopez@gmail.com', '${userPassword}', 'Salamanca', true);
     `);
 
     // Creando menssages example
@@ -97,7 +118,31 @@ async function main() {
     await connection.query(`
       insert into messages (title, text, type, category, from_users_id, to_users_id)
       values
-      ('Instalando Windows', 'Me enseñó a configurar windows para programar web', 'Agradecimiento', 'Profesional', 3, 1);
+      ('Instalando Windows', 'Me enseñó a configurar windows para programar web', 'Agradecimiento', 'Personal', 3, 1);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, from_users_id, to_users_id)
+      values
+      ('Me ayudo en el traslado a la ciudad', 'Me ayudó en el tralado a la ciudad y me presentó a mis compañeros', 'Agradecimiento', 'Personal', 2, 6);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, from_users_id, to_users_id)
+      values
+      ('Jefe de proyecto muy atento', 'Organizó el equipo y las tareas perfectamente resolviendo todas las dudas', 'Agradecimiento', 'Personal', 4, 1);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, from_users_id, to_users_id)
+      values
+      ('Formación interna', 'Me dio la formación interna de la empresa sobre distintos temas y me ayudo mucho', 'Agradecimiento', 'Profesional', 1, 2);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, from_users_id, to_users_id)
+      values
+      ('Programador Java eficiente', 'Trabaje con él en varios proyectos de Java y salieron adelante de manera exitosa', 'Referencia', 'Profesional', 5, 3);
     `);
   }
 
