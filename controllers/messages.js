@@ -32,11 +32,13 @@ async function listMessages(req, res, next) {
       );
     } else {
       [result] = await connection.query(`
-      select concat_ws(' ',a.name, b.surname) as De, concat_ws(' ',c.name, d.surname) as Para, title, text, image, type, category, create_message from messages
+      select concat_ws(' ',a.name, b.surname) as De, e.avatar as avatar_from, concat_ws(' ',c.name, d.surname) as Para, f.avatar as avatar_to, title, text, image, type, category, create_message from messages
       inner join users a on a.id = from_users_id
       inner join users b on b.id = from_users_id
       inner join users c on c.id = to_users_id
       inner join users d on d.id = to_users_id
+      inner join users e on e.id = from_users_id
+      inner join users f on f.id = to_users_id
       order by create_message desc;
     `);
     }
@@ -47,7 +49,7 @@ async function listMessages(req, res, next) {
 
     res.send({
       status: 'ok',
-      message: 'Lista de mensajes',
+      message: 'Lista de mensajes De Para en orden descendente',
       data: result,
     });
   } catch (error) {
