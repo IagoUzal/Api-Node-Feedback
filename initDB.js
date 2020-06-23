@@ -66,7 +66,8 @@ async function main() {
 
     // Creando user Admin
     const adminPassword = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD, 10);
-    const adminAvatar = `${process.env.HOST}/static/uploads/iagoavatar.jpg`;
+    // const adminAvatar = `${process.env.HOST}/static/uploads/iagoavatar.jpg`;
+    const adminAvatar = faker.internet.avatar();
 
     await connection.query(`
       insert into users (name, surname, avatar, email, password, location, role, active)
@@ -77,6 +78,10 @@ async function main() {
     // Creando user normal
     const userPassword = await bcrypt.hash(process.env.DEFAULT_USER_DEMO_PASSWORD, 10);
     const avatarFaker = faker.internet.avatar();
+    const avatarFaker2 = faker.internet.avatar();
+    const avatarFaker3 = faker.internet.avatar();
+    const avatarFaker4 = faker.internet.avatar();
+    const avatarFaker5 = faker.internet.avatar();
 
     await connection.query(`
       insert into users (name, surname, avatar, email, password, location, active) 
@@ -87,25 +92,25 @@ async function main() {
     await connection.query(`
       insert into users (name, surname, avatar, email, password, location, active) 
       values
-      ('Juan', 'Dominguez Lopez', '${avatarFaker}', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
+      ('Juan', 'Dominguez Lopez', '${avatarFaker2}', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
     `);
 
     await connection.query(`
       insert into users (name, surname, avatar, email, password, location, active) 
       values
-      ('Noe', 'Torres Torres', '${avatarFaker}', 'tttorres@gmail.com', '${userPassword}', 'Madrid', true);
+      ('Noe', 'Torres Torres', '${avatarFaker3}', 'tttorres@gmail.com', '${userPassword}', 'Madrid', true);
     `);
 
     await connection.query(`
       insert into users (name, surname, avatar, email, password, location, active) 
       values
-      ('Jordi', 'Camps Vilanova', '${avatarFaker}', 'jjjordi@gmail.com', '${userPassword}', 'Barcelona', true);
+      ('Jordi', 'Camps Vilanova', '${avatarFaker4}', 'jjjordi@gmail.com', '${userPassword}', 'Barcelona', true);
     `);
 
     await connection.query(`
       insert into users (name, surname, avatar, email, password, location, active) 
       values
-      ('Paco', 'Lopez Lopez', '${avatarFaker}', 'plopez@gmail.com', '${userPassword}', 'Salamanca', true);
+      ('Paco', 'Lopez Lopez', '${avatarFaker5}', 'plopez@gmail.com', '${userPassword}', 'Salamanca', true);
     `);
 
     // Creando menssages example
