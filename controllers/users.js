@@ -160,7 +160,7 @@ async function loginUsers(req, res, next) {
     res.send({
       status: 'ok',
       message: 'Login Ok',
-      data: { token },
+      data: { tokenPayload, token },
     });
   } catch (error) {
     next(error);
