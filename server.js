@@ -17,7 +17,14 @@ const {
   editPassword,
   validateUser,
 } = require('./controllers/users');
-const { listMessages, getMessage, newMessage, editMessage, deleteMessage } = require('./controllers/messages');
+const {
+  listMessages,
+  getMessage,
+  getMessagesFrom,
+  newMessage,
+  editMessage,
+  deleteMessage,
+} = require('./controllers/messages');
 const { userIsAuthenticated, userIsAdmin } = require('./middlewares/auth');
 
 //Middlewares
@@ -42,6 +49,7 @@ app.get('/users/:id/validate', validateUser);
 // Routes Messages
 app.get('/messages', listMessages); // Anonimo
 app.get('/messages/:id', getMessage); // Anonimo
+app.get('/messages/users/:id', userIsAuthenticated, getMessagesFrom);
 app.post('/messages', userIsAuthenticated, newMessage); // Solo Usuarios o admin
 app.put('/messages/:id', userIsAuthenticated, editMessage); // Solo Usuarios que crearon el mensaje o admin
 app.delete('/messages/:id', userIsAuthenticated, deleteMessage); // Solo Usuarios que crearon el mensaje o admin
