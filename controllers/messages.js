@@ -90,6 +90,33 @@ async function getMessage(req, res, next) {
 
 // Rutas para authenticated users
 
+// GET - /messages/users/:id
+
+async function getMessagesFrom(req, res, next) {
+  try {
+    const { id } = req.params;
+    const connection = await getConnection();
+    const [result] = await connection.query(
+      `
+      select concat_ws(' ', a.name, b.surname) as Para, c.avatar as avatar_to, title, text, image, type, category, from_users_id from messages
+      inner join users a on a.id = to_users_id
+      inner join users b on b.id = to_users_id
+      inner join users c on c.id = to_users_id
+      where from_users_id=?;
+    `,
+      [id]
+    );
+
+    connection.release();
+    res.send({
+      status: 'ok',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // POST - /messages
 
 async function newMessage(req, res, next) {
@@ -258,6 +285,7 @@ async function deleteMessage(req, res, next) {
 module.exports = {
   listMessages,
   getMessage,
+  getMessagesFrom,
   newMessage,
   editMessage,
   deleteMessage,
