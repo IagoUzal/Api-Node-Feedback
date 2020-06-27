@@ -98,7 +98,7 @@ async function getMessagesFrom(req, res, next) {
     const connection = await getConnection();
     const [result] = await connection.query(
       `
-      select concat_ws(' ', a.name, b.surname) as Para, c.avatar as avatar_to, title, text, image, type, category, from_users_id from messages
+      select messages.id, concat_ws(' ', a.name, b.surname) as Para, c.avatar as avatar_to, title, text, image, type, category, from_users_id from messages
       inner join users a on a.id = to_users_id
       inner join users b on b.id = to_users_id
       inner join users c on c.id = to_users_id
@@ -178,11 +178,11 @@ async function editMessage(req, res, next) {
     const { id } = req.params;
     const { title, text, type, category } = req.body;
 
-    if (!title || !text || !type || !category) {
-      const error = new Error('Los campos titulo, texto, type, category son obligatorios');
-      error.httpCode = 400;
-      throw error;
-    }
+    // if (!title || !text || !type || !category) {
+    //   const error = new Error('Los campos titulo, texto, type, category son obligatorios');
+    //   error.httpCode = 400;
+    //   throw error;
+    // }
 
     const [current] = await connection.query(`select image, from_users_id from messages where id=?`, [id]);
     console.log(current);
