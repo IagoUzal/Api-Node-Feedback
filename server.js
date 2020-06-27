@@ -36,6 +36,8 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 // Cors
 app.use(cors());
+// Pasando el directorio estatico paraa poder acceder a el a traves del endpoint
+app.use(express.static('static'));
 
 // Routes Users
 app.get('/users', listUsers); // Anonimo
