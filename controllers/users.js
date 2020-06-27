@@ -134,7 +134,7 @@ async function loginUsers(req, res, next) {
 
     const [dbUser] = await connection.query(
       `
-      select id, email, password, role from users where email=? and active=1
+      select id, email, password, avatar, role from users where email=? and active=1
     `,
       [email]
     );
@@ -154,7 +154,7 @@ async function loginUsers(req, res, next) {
       throw generateError('Password incorrecta', 401);
     }
 
-    const tokenPayload = { id: user.id, email: user.email, role: user.role };
+    const tokenPayload = { id: user.id, email: user.email, avatar: user.avatar, role: user.role };
     const token = jwt.sign(tokenPayload, process.env.SECRET, { expiresIn: '10h' });
 
     res.send({
