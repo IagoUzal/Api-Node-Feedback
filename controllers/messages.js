@@ -265,7 +265,7 @@ async function deleteMessage(req, res, next) {
       throw error;
     }
 
-    if (current[0].image) {
+    if (current[0].image !== 'sin imagen') {
       await deleteImage(current[0].image);
     }
 
