@@ -213,12 +213,33 @@ async function editUsers(req, res, next) {
       savedFileName = current[0].avatar;
     }
 
-    await connection.query(
-      `
-      update users set name=?, surname=?, email=?, location=?, avatar=? where id=?
-    `,
-      [name, surname, email, location, savedFileName, id]
-    );
+    // await connection.query(
+    //   `
+    //   update users set name=?, surname=?, email=?, location=?, avatar=? where id=?
+    // `,
+    //   [name, surname, email, location, savedFileName, id]
+    // );
+
+    // Actualizando datos
+    if (name) {
+      await connection.query(`update users set name=? where id=?`, [name, id]);
+    }
+
+    if (surname) {
+      await connection.query(`update users set surname=? where id=?`, [surname, id]);
+    }
+
+    if (email) {
+      await connection.query(`update users set email=? where id=?`, [email, id]);
+    }
+
+    if (location) {
+      await connection.query(`update users set location=? where id=?`, [location, id]);
+    }
+
+    if (req.files && req.files.avatar) {
+      await connection.query(`update users set avatar=? where id=?`, [savedFileName, id]);
+    }
 
     res.send({
       status: 'ok',
