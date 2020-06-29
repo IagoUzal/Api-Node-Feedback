@@ -81,7 +81,7 @@ async function listUsers(req, res, next) {
     connection = await getConnection();
 
     const [users] = await connection.query(`
-      select name, surname, avatar, location from users
+      select id, name, surname, avatar, location from users
     `);
 
     res.send({ status: 'ok', messsage: 'lista de usuarios', data: users });
