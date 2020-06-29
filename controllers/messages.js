@@ -32,7 +32,7 @@ async function listMessages(req, res, next) {
       );
     } else {
       [result] = await connection.query(`
-      select concat_ws(' ',a.name, b.surname) as De, e.avatar as avatar_from, concat_ws(' ',c.name, d.surname) as Para, f.avatar as avatar_to, title, text, image, type, category, create_message from messages
+      select from_users_id, concat_ws(' ',a.name, b.surname) as De, e.avatar as avatar_from, to_users_id, concat_ws(' ',c.name, d.surname) as Para, f.avatar as avatar_to, title, text, image, type, category, create_message from messages
       inner join users a on a.id = from_users_id
       inner join users b on b.id = from_users_id
       inner join users c on c.id = to_users_id
@@ -103,6 +103,35 @@ async function getMessagesFrom(req, res, next) {
       inner join users b on b.id = to_users_id
       inner join users c on c.id = to_users_id
       where from_users_id=?;
+    `,
+      [id]
+    );
+
+    connection.release();
+    res.send({
+      status: 'ok',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// GET - /messages/to/:id
+
+async function getMessagesTo(req, res, next) {
+  try {
+    const { id } = req.params;
+    const connection = await getConnection();
+    const [result] = await connection.query(
+      `
+      select messages.id, concat_ws(' ', a.name, b.surname) as De, c.avatar as avatar_from, concat_ws(' ', d.name, e.surname) as Para, title, text, image, type, category, from_users_id from messages
+      inner join users a on a.id = from_users_id
+      inner join users b on b.id = from_users_id
+      inner join users c on c.id = from_users_id
+      inner join users d on d.id = to_users_id
+      inner join users e on e.id = to_users_id
+      where to_users_id=?;
     `,
       [id]
     );
@@ -286,6 +315,7 @@ module.exports = {
   listMessages,
   getMessage,
   getMessagesFrom,
+  getMessagesTo,
   newMessage,
   editMessage,
   deleteMessage,
