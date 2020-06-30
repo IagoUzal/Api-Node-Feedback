@@ -30,6 +30,21 @@ async function registerUsers(req, res, next) {
       throw generateError('El email ya existe', 409);
     }
 
+    // Procesando imagen de perfil
+    let savedFileName;
+
+    if (req.files && req.files.avatar) {
+      try {
+        savedFileName = await processAndSaveImage(req.files.avatar);
+      } catch (error) {
+        const imageError = new Error('No se ha podido procesar la imagen');
+        imageError.httpCode = 400;
+        throw imageError;
+      }
+    } else {
+      savedFileName = avatar;
+    }
+
     // Hash Password
     const dbPassword = await bcrypt.hash(password, 10);
 
@@ -37,10 +52,10 @@ async function registerUsers(req, res, next) {
 
     const [result] = await connection.query(
       `
-      insert into users (name, surname, email, password, location, registration_code)
+      insert into users (name, surname, email, password, location, avatar, registration_code)
       values
-      (?, ?, ?, ?, ?, ?)`,
-      [name, surname, email, dbPassword, location, registrationCode]
+      (?, ?, ?, ?, ?, ?, ?)`,
+      [name, surname, email, dbPassword, location, savedFileName, registrationCode]
     );
 
     const validationURL = `${process.env.HOST}/users/${result.insertId}/validate?code=${registrationCode}`;
@@ -48,7 +63,7 @@ async function registerUsers(req, res, next) {
     try {
       await sendEmail({
         email: email,
-        title: 'Valida tu cuenta de usuario en la app de diario mysql',
+        title: 'Valida tu cuenta de usuario en la app de Feedback',
         content: `Para validar tu cuenta de usuario pega esta url en tu navegador: ${validationURL}`,
       });
     } catch (error) {
@@ -81,7 +96,7 @@ async function listUsers(req, res, next) {
     connection = await getConnection();
 
     const [users] = await connection.query(`
-      select id, name, surname, avatar, location from users
+      select id, name, surname, avatar, location, create_user from users order by create_user desc;
     `);
 
     res.send({ status: 'ok', messsage: 'lista de usuarios', data: users });
