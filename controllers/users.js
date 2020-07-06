@@ -30,20 +30,20 @@ async function registerUsers(req, res, next) {
       throw generateError('El email ya existe', 409);
     }
 
-    // Procesando imagen de perfil
-    let savedFileName;
+    // // Procesando imagen de perfil
+    // let savedFileName;
 
-    if (req.files && req.files.avatar) {
-      try {
-        savedFileName = await processAndSaveImage(req.files.avatar);
-      } catch (error) {
-        const imageError = new Error('No se ha podido procesar la imagen');
-        imageError.httpCode = 400;
-        throw imageError;
-      }
-    } else {
-      savedFileName = avatar;
-    }
+    // if (req.files && req.files.avatar) {
+    //   try {
+    //     savedFileName = await processAndSaveImage(req.files.avatar);
+    //   } catch (error) {
+    //     const imageError = new Error('No se ha podido procesar la imagen');
+    //     imageError.httpCode = 400;
+    //     throw imageError;
+    //   }
+    // } else {
+    //   savedFileName = avatar;
+    // }
 
     // Hash Password
     const dbPassword = await bcrypt.hash(password, 10);
@@ -52,10 +52,10 @@ async function registerUsers(req, res, next) {
 
     const [result] = await connection.query(
       `
-      insert into users (name, surname, email, password, location, avatar, registration_code)
+      insert into users (name, surname, email, password, location, registration_code)
       values
-      (?, ?, ?, ?, ?, ?, ?)`,
-      [name, surname, email, dbPassword, location, savedFileName, registrationCode]
+      (?, ?, ?, ?, ?, ?)`,
+      [name, surname, email, dbPassword, location, registrationCode]
     );
 
     const validationURL = `${process.env.HOST}/users/${result.insertId}/validate?code=${registrationCode}`;
