@@ -31,7 +31,9 @@ async function main() {
     avatar varchar(255) default 'sin imagen',
     email varchar(30) not null unique,
     password varchar(255) not null,
-    location varchar(30) default 'sin provincia' not null,
+    location varchar(30) default 'sin definir',
+    biography varchar(255) default 'sin definir',
+    job varchar (255) default 'sin definir',
     role enum("normal", "admin") default "normal" not null,
     active boolean default false not null,
     registration_code varchar(255),
@@ -70,9 +72,9 @@ async function main() {
     const adminAvatar = faker.internet.avatar();
 
     await connection.query(`
-      insert into users (name, surname, avatar, email, password, location, role, active)
+      insert into users (name, surname, avatar, job, biography, email, password, location, role, active)
       values
-      ('Iago', 'Alvarez Uzal','iagoavatar.jpg', 'iagouzal@gmail.com', '${adminPassword}', 'A Coruña', 'admin', true)
+      ('Iago', 'Alvarez Uzal','iagoavatar.jpg', 'Developer', 'Soy Full Stack Developer trabajando en remoto como contractor/freelancer para empresas internacionales desde Barcelona', 'iagouzal@gmail.com', '${adminPassword}', 'La Coruña', 'admin', true)
     `);
 
     // Creando user normal
@@ -84,46 +86,46 @@ async function main() {
     const avatarFaker5 = faker.internet.avatar();
 
     await connection.query(`
-      insert into users (name, surname, avatar, email, password, location, active) 
+      insert into users (name, surname, avatar, job, biography, email, password, location, active) 
       values
-      ('Ruben', 'Perez Perez', 'rubi.jpg', 'rubii9@gmail.com', '${userPassword}', 'A Coruña', true);
+      ('Ruben', 'Perez Perez', 'rubi.jpg', 'UX/UI', 'Estudié ingeniería multimedia en Helsinki y Hong Kong, he trabajado tanto en multinacionales como en startups', 'rubii9@gmail.com', '${userPassword}', 'La Coruña', true);
     `);
 
     await connection.query(`
-      insert into users (name, surname, avatar, email, password, location, active) 
+      insert into users (name, surname, avatar, job, biography, email, password, location, active) 
       values
-      ('Juan', 'Dominguez Lopez', 'juan.jpg', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
+      ('Juan', 'Dominguez Lopez','juan.jpg', 'Marketing', 'SEO, Google Analitycs, me encanta viajar por todo el mundo siempre que puedo.', 'dlopez@gmail.com', '${userPassword}', 'Lugo', true);
     `);
 
     await connection.query(`
-      insert into users (name, surname, avatar, email, password, location, active) 
+      insert into users (name, surname, avatar, job, biography, email, password, location, active) 
       values
-      ('Noe', 'Torres Torres', 'noe.jpg', 'tttorres@gmail.com', '${userPassword}', 'Madrid', true);
+      ('Noe', 'Torres Torres', 'noe.jpg', 'Developer', 'Python developer, me encanta la naturaleza y el deporte', 'tttorres@gmail.com', '${userPassword}', 'Madrid', true);
     `);
 
     await connection.query(`
-      insert into users (name, surname, avatar, email, password, location, active) 
+      insert into users (name, surname, avatar, job, biography, email, password, location, active) 
       values
-      ('Jordi', 'Camps Vilanova', 'jordi.jpg', 'jjjordi@gmail.com', '${userPassword}', 'Barcelona', true);
+      ('Jordi', 'Camps Vilanova', 'jordi.jpg', 'Developer', 'Javascript developer, he trabajado en diferentes paises y culturas', 'jjjordi@gmail.com', '${userPassword}', 'Barcelona', true);
     `);
 
     await connection.query(`
-      insert into users (name, surname, avatar, email, password, location, active) 
+      insert into users (name, surname, avatar, job, biography, email, password, location, active) 
       values
-      ('Paco', 'Lopez Lopez', 'paco.jpg', 'plopez@gmail.com', '${userPassword}', 'Salamanca', true);
+      ('Paco', 'Lopez Lopez', 'paco.jpg', 'Diseñador', 'Trabajo con todas las herramientas de Adobe, filmmaker aficionado', 'plopez@gmail.com', '${userPassword}', 'Salamanca', true);
     `);
 
     // Creando menssages example
     await connection.query(`
       insert into messages (title, text, type, category, image, from_users_id, to_users_id)
       values
-      ('Configurando MySQL', 'Me ayudo mucho en la configuración de MySQl', 'Referencia', 'Profesional', 'message1.jpg', 2, 3);
+      ('Configurando MySQL', 'Me ayudo mucho en la configuración de MySQl', 'Referencia', 'Profesional', 'message1.jpg', 1, 2);
     `);
 
     await connection.query(`
       insert into messages (title, text, type, category, image, from_users_id, to_users_id)
       values
-      ('Instalando Windows', 'Me enseñó a configurar windows para programar web', 'Agradecimiento', 'Personal', 'message2.jpg', 3, 1);
+      ('Instalando Windows', 'Me enseñó a configurar windows para programar web', 'Agradecimiento', 'Personal', 'message2.jpg', 1, 3);
     `);
 
     await connection.query(`
@@ -135,19 +137,43 @@ async function main() {
     await connection.query(`
       insert into messages (title, text, type, category, image, from_users_id, to_users_id)
       values
-      ('Jefe de proyecto muy atento', 'Organizó el equipo y las tareas perfectamente resolviendo todas las dudas', 'Agradecimiento', 'Personal', 'message4.jpg', 4, 1);
+      ('Jefe de proyecto muy atento', 'Organizó el equipo y las tareas perfectamente resolviendo todas las dudas', 'Agradecimiento', 'Personal', 'message4.jpg', 2, 1);
     `);
 
     await connection.query(`
       insert into messages (title, text, type, category, image, from_users_id, to_users_id)
       values
-      ('Formación interna', 'Me dio la formación interna de la empresa sobre distintos temas y me ayudo mucho', 'Agradecimiento', 'Profesional', 'message5.jpg', 1, 2);
+      ('Formación interna', 'Me dio la formación interna de la empresa sobre distintos temas y me ayudo mucho', 'Agradecimiento', 'Profesional', 'message5.jpg', 3, 4);
     `);
 
     await connection.query(`
       insert into messages (title, text, type, category, image, from_users_id, to_users_id)
       values
-      ('Programador Java eficiente', 'Trabaje con él en varios proyectos de Java y salieron adelante de manera exitosa', 'Referencia', 'Profesional', 'message6.jpg', 5, 3);
+      ('Programador Java eficiente', 'Trabaje con él en varios proyectos de Java y salieron adelante de manera exitosa', 'Referencia', 'Profesional', 'message6.jpg', 3, 2);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, image, from_users_id, to_users_id)
+      values
+      ('Formación UI/UX', 'Me dio la formación interna de UX/UI un referente para mi', 'Referencia', 'Profesional', 'message7.jpg', 4, 5);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, image, from_users_id, to_users_id)
+      values
+      ('Experto en sistemas', 'Configuracines exitosas en los sistemas de la empresa', 'Referencia', 'Profesional', 'message8.jpg', 4, 2);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, image, from_users_id, to_users_id)
+      values
+      ('Mi profe de diseño', 'Me enseñó un monton de "tips" y recursos para avanzar en diseño', 'Agradecimiento', 'Profesional', 'message9.jpg', 5, 2);
+    `);
+
+    await connection.query(`
+      insert into messages (title, text, type, category, image, from_users_id, to_users_id)
+      values
+      ('Gran conocimiento en Hardware', 'Dominio de los diferentes sistemas del sector y su uso adecuado', 'Referencia', 'Profesional', 'message10.jpg', 5, 3);
     `);
   }
 
