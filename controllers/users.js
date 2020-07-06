@@ -96,7 +96,7 @@ async function listUsers(req, res, next) {
     connection = await getConnection();
 
     const [users] = await connection.query(`
-      select id, name, surname, avatar, location, create_user from users order by create_user desc;
+      select id, name, surname, avatar, job, biography, location, create_user from users order by create_user desc;
     `);
 
     res.send({ status: 'ok', messsage: 'lista de usuarios', data: users });
@@ -117,7 +117,7 @@ async function infoUsers(req, res, next) {
 
     const [result] = await connection.query(
       `
-      select name, surname, avatar, email, location from users where id=?
+      select name, surname, avatar, job, biography, email, location from users where id=?
     `,
       [id]
     );
@@ -189,10 +189,10 @@ async function loginUsers(req, res, next) {
 async function editUsers(req, res, next) {
   let connection;
   try {
-    await editUserSchema.validateAsync(req.body);
+    // await editUserSchema.validateAsync(req.body);
 
     const { id } = req.params;
-    const { name, surname, email, location } = req.body;
+    const { name, surname, email, location, job, biography } = req.body;
     connection = await getConnection();
 
     const [current] = await connection.query(
@@ -252,6 +252,14 @@ async function editUsers(req, res, next) {
       await connection.query(`update users set location=? where id=?`, [location, id]);
     }
 
+    if (job) {
+      await connection.query(`update users set job=? where id=?`, [job, id]);
+    }
+
+    if (biography) {
+      await connection.query(`update users set biography=? where id=?`, [biography, id]);
+    }
+
     if (req.files && req.files.avatar) {
       await connection.query(`update users set avatar=? where id=?`, [savedFileName, id]);
     }
@@ -265,6 +273,8 @@ async function editUsers(req, res, next) {
         surname: surname,
         email: email,
         location: location,
+        job: job,
+        biography: biography,
         avatar: savedFileName,
       },
     });
