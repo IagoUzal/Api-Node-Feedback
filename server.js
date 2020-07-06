@@ -36,7 +36,11 @@ app.use(bodyParser.json());
 // Multipart parsing
 app.use(fileUpload());
 // Cors
-app.use(cors());
+app.use(
+  cors({
+    optionsSuccessStatus: 200,
+  })
+);
 // Pasando el directorio estatico paraa poder acceder a el a traves del endpoint
 app.use(express.static('static'));
 
