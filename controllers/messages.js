@@ -98,11 +98,12 @@ async function getMessagesFrom(req, res, next) {
     const connection = await getConnection();
     const [result] = await connection.query(
       `
-      select messages.id, concat_ws(' ', a.name, b.surname) as Para, c.avatar as avatar_to, title, text, image, type, category, from_users_id from messages
+      select messages.id, concat_ws(' ', a.name, b.surname) as Para, c.avatar as avatar_to, title, text, image, type, category, from_users_id, create_message from messages
       inner join users a on a.id = to_users_id
       inner join users b on b.id = to_users_id
       inner join users c on c.id = to_users_id
-      where from_users_id=?;
+      where from_users_id=?
+      order by create_message desc;
     `,
       [id]
     );
@@ -125,13 +126,14 @@ async function getMessagesTo(req, res, next) {
     const connection = await getConnection();
     const [result] = await connection.query(
       `
-      select messages.id, concat_ws(' ', a.name, b.surname) as De, c.avatar as avatar_from, concat_ws(' ', d.name, e.surname) as Para, title, text, image, type, category, from_users_id from messages
+      select messages.id, concat_ws(' ', a.name, b.surname) as De, c.avatar as avatar_from, concat_ws(' ', d.name, e.surname) as Para, title, text, image, type, category, from_users_id, create_message from messages
       inner join users a on a.id = from_users_id
       inner join users b on b.id = from_users_id
       inner join users c on c.id = from_users_id
       inner join users d on d.id = to_users_id
       inner join users e on e.id = to_users_id
-      where to_users_id=?;
+      where to_users_id=?
+      order by create_message desc;
     `,
       [id]
     );
