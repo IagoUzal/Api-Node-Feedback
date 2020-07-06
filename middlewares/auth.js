@@ -5,6 +5,7 @@ const { getConnection } = require('../db');
 const { generateError } = require('../helpers');
 
 async function userIsAuthenticated(req, res, next) {
+  let connection;
   try {
     const { authorization } = req.headers;
 
@@ -32,7 +33,7 @@ async function userIsAuthenticated(req, res, next) {
 
     const { id, iat } = decoded;
 
-    const connection = await getConnection();
+    connection = await getConnection();
 
     const [result] = await connection.query(`select last_password_update from users where id=?`, [id]);
 
@@ -56,6 +57,10 @@ async function userIsAuthenticated(req, res, next) {
     const authError = new Error('Invalid authorization');
     authError.httpCode = 401;
     next(authError);
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 }
 
