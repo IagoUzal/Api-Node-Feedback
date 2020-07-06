@@ -66,7 +66,8 @@ const locationSchema = Joi.string().valid(
   'Valladolid',
   'Vizcaya',
   'Zamora',
-  'Zaragoza'
+  'Zaragoza',
+  'sin definir'
 );
 
 //Email
