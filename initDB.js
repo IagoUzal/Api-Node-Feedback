@@ -28,7 +28,7 @@ async function main() {
 	  id int primary key auto_increment,
     name varchar(30) not null,
     surname varchar(60) not null,
-    avatar varchar(255) default 'sin imagen',
+    avatar varchar(255) default 'avatar.png',
     email varchar(30) not null unique,
     password varchar(255) not null,
     location varchar(30) default 'sin definir',
